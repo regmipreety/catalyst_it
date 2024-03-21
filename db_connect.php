@@ -4,7 +4,7 @@ $username = "root";
 $password = "";
 $dbName = "catalyst";
 
-// Create a connection (object-oriented)
+// Create a connection
 $conn = new mysqli($servername, $username, $password, $dbName);
 
 // Check connection
