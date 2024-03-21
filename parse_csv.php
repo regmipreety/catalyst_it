@@ -18,6 +18,12 @@ if(isset($argv[1]) && isset($argv[2])) {
     // Open the CSV file
     $file = fopen($filename, "r");
     if($file){
+        // Check if the users table exists
+        require_once "db_connect.php";
+        $table_check_query = "SHOW TABLES LIKE 'users'";
+        $result = mysqli_query($conn, $table_check_query);
+
+        if ($result && mysqli_num_rows($result) > 0) {
         //skip the first header
         fgetcsv($file);
         //read and process each line of CSV file
@@ -53,8 +59,11 @@ if(isset($argv[1]) && isset($argv[2])) {
             } else {
                 echo "Invalid email: $email. Please check the email address and try again.\n";
             }
+            } 
+        } else {
+            fclose($file);
+            echo "Please create users table first.\n";
         }
-        fclose($file);
 
         // Close the connection after finishing database operations
         if(!$dry_run) {
