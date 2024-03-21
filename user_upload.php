@@ -3,7 +3,6 @@ $status = "Error importing csv files \n";
 $userInput = $argv[1];
 switch ($userInput){
     case '--file':
-        echo "CSV file name: $filename\n";
     // Call the function to parse the CSV file
         include "parse_csv.php";
         break;
