@@ -1,24 +1,33 @@
 <?php
-include_once "db_connect.php";
-$lines = file('users.csv', FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
-$csv = array_map('str_getcsv', $lines);
+$status = "Error importing csv files \n";
+$userInput = $argv[1];
+switch ($userInput){
+    case '--file':
+        echo "CSV file name: $filename\n";
+    // Call the function to parse the CSV file
+        include "parse_csv.php";
+        break;
+    case '--create_table':
+        echo "creating table...";
+        include "create_table.php";
+        break;
+    case '-u':
+        echo "root";
+        break;
+    case '-p':
+        echo "";
+        break;
+    case '-h';
+        echo "localhost";
+        break;
+    case '--help':
+        include "display_list.php";
+        break;
+        
+    default:
+        echo "invalid argument provided";
 
-$col_names = array_shift($csv);
-
-
-$users = [];
-$stmt = 'INSERT INTO users (name, surname, email) VALUES (?,?,?)';
-mysqli_query($conn, $stmt) or die(mysqli); 
-foreach($csv as $row) {
-    $users[] = [
-        $col_names[0] => ucfirst(strtolower($row[0])),
-        $col_names[1] => ucfirst(strtolower($row[1])),
-        $col_names[2] => strtolower(strtolower($row[2])),
-    ];
 }
 
-foreach($users as $user) {
-    $stmt->execute($user);
-}
-
+    
 ?>
