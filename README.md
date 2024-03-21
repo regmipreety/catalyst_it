@@ -2,6 +2,8 @@
 ## Requirements
     * Php version 8.0.*
     * Xammp server or any other server to run localhost and MySql server
+    * Notepad or any other text editor
+    * Can be run on windows/ubuntu or mac
 
 ## Running the application
     * Download/clone from the git repository: https://github.com/regmipreety/catalyst_it
