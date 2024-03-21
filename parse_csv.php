@@ -1,19 +1,35 @@
 <?php
-    require_once "db_connect.php";
+// Check if the necessary command-line arguments are provided
+if(isset($argv[1]) && isset($argv[2])) {
+    // Extract filename and dry run flag from command-line arguments
+    $filename = $argv[2];
+    $dry_run = false; // Default to false
 
-        $file = fopen($filename, "r");
-        if($file){
-            //skip the first header
-            fgetcsv($file);
-            //read and process each line of CSV file
-            while (($emapData = fgetcsv($file, 10000, ",")) !== FALSE) {
-                $firstName = ucfirst(strtolower(trim($emapData[0])));
-                $lastName = ucfirst(strtolower(trim($emapData[1])));
-                $email = strtolower(trim($emapData[2]));
-                
-                echo "Processing email: $email\n";
+    // Check if --dry_run option is provided
+    if(isset($argv[3])){
+        if( $argv[3] == "--dry_run") {
+            $dry_run = true;
+        } else {
+            echo "Error: invalid command line argument";
+            exit(1);
+        }
+    }
+    
+    // Open the CSV file
+    $file = fopen($filename, "r");
+    if($file){
+        //skip the first header
+        fgetcsv($file);
+        //read and process each line of CSV file
+        while (($emapData = fgetcsv($file, 10000, ",")) !== FALSE) {
+            $firstName = ucfirst(strtolower(trim($emapData[0])));
+            $lastName = ucfirst(strtolower(trim($emapData[1])));
+            $email = strtolower(trim($emapData[2]));
             
-                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo "Processing email: $email\n";
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                if(!$dry_run) {
+                    require_once "db_connect.php";
                     // Prepare the SQL statement
                     $sql = "INSERT INTO users(name, surname, email) VALUES (?, ?, ?)";
                     $stmt = mysqli_prepare($conn, $sql);
@@ -30,15 +46,27 @@
             
                     // Close statement
                     mysqli_stmt_close($stmt);
+                    // Do not close the connection here
                 } else {
-                    echo "Invalid email: $email. Please check the email address and try again.\n";
+                    echo "This is a dry run. No records inserted.\n";
                 }
+            } else {
+                echo "Invalid email: $email. Please check the email address and try again.\n";
             }
-            
         }
-       
-    fclose($file);
-    $status = "CSV has been successfully updated \n";
+        fclose($file);
 
-    echo $status;
+        // Close the connection after finishing database operations
+        if(!$dry_run) {
+            mysqli_close($conn);
+        }
+
+        $status = "CSV has been successfully processed.\n";
+        echo $status;
+    } else {
+        echo "Error: Unable to open CSV file.\n";
+    }
+} else {
+    echo "Error: Invalid or missing command-line arguments.\n";
+}
 ?>
